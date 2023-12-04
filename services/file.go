@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"mdhesari/coralflora/model"
 	"os"
 )
@@ -33,5 +34,17 @@ func CreateFile(path string) (*os.File, error) {
 func Update(path string, flowers []*model.Flower) {
 	contents, _ := json.Marshal(flowers)
 
-	os.WriteFile(path, contents, 0)
+	fmt.Println(path)
+
+	err = os.WriteFile(path, contents, 0644)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	contents, err = ReadFromFile(path)
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }

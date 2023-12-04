@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"mdhesari/coralflora/model"
+	"mdhesari/coralflora/repositories"
 	"os"
 	"strconv"
 )
@@ -20,6 +21,8 @@ var (
 
 func main() {
 	fmt.Println("Welcome To Coralflora!")
+
+	flowers = repositories.GetItems()
 
 	for {
 		fmt.Println("Please enter a command : ")
@@ -55,6 +58,13 @@ func isAdmin() bool {
 
 func addFlower() {
 	name = askQuestion("Enter the name :")
+
+	isFound, _ := repositories.FindByName(flowers, name)
+
+	if (isFound != nil) {
+		fmt.Println("Name already exists!")
+	}
+
 	price, _ = strconv.Atoi(askQuestion("Enter the price :"))
 	stockCount, _ = strconv.Atoi(askQuestion("Enter stock count :"))
 
@@ -71,7 +81,7 @@ func insertIntoDataStorage(flower *model.Flower) {
 	flower.Id = len(flowers) + 1
 	flowers = append(flowers, flower)
 
-
+	repositories.UpdateItems(flowers)
 }
 
 func askQuestion(q string) string {
@@ -84,7 +94,7 @@ func askQuestion(q string) string {
 func buyFlower() {
 	id, _ = strconv.Atoi(askQuestion("Enter the flower Id :"))
 
-	flower, id = findFlowerById(id)
+	flower, id = repositories.FindById(flowers, id)
 
 	if flower == nil {
 		fmt.Println("Flower is not found!")
@@ -101,18 +111,9 @@ func buyFlower() {
 	flower.StockCount -= 1
 	flowers[id] = flower
 
+	repositories.UpdateItems(flowers)
+
 	fmt.Println("Thanks for buying our flower!")
 	fmt.Printf("Now there is only %d in stock.", flower.StockCount)
 	fmt.Println()
-}
-
-func findFlowerById(id int) (*model.Flower, int) {
-	for i, x := range flowers {
-		if x.Id == id {
-			return x, i
-		}
-	}
-
-	// Return nil pointer when not found
-	return nil, 0
 }
