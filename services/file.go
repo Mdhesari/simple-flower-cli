@@ -27,6 +27,7 @@ func CreateFile(path string) (*os.File, error) {
 
 		return nil, ferr
 	}
+	defer f.Close()
 
 	return f, nil
 }
